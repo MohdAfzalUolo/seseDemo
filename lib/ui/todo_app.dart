@@ -1,3 +1,4 @@
+import 'package:dummy/data/todo_data.dart';
 import 'package:flutter/material.dart';
 
 class TodoApp extends StatefulWidget {
@@ -8,9 +9,25 @@ class TodoApp extends StatefulWidget {
 }
 
 class _TodoAppState extends State<TodoApp> {
+  List<TodoItemData> todoList = [];
+  late TextEditingController _textEditingController;
+
+  @override
+  void initState() {
+    _textEditingController = TextEditingController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text('Todo App'),
       ),
@@ -21,23 +38,39 @@ class _TodoAppState extends State<TodoApp> {
             child: ListView.separated(
               padding: EdgeInsets.symmetric(vertical: 40),
               shrinkWrap: true,
-              itemCount: 40,
+              itemCount: todoList.length,
               itemBuilder: (context, index) {
                 return Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                      color: Colors.greenAccent,
+                      color: todoList[index].isCompleted
+                          ? Colors.greenAccent
+                          : Colors.deepOrangeAccent,
                       borderRadius: BorderRadius.circular(8)),
                   width: double.infinity,
                   height: 60,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('container with idex of: $index'),
-                      Icon(
-                        Icons.delete,
+                      Text(
+                          '${todoList[index].title}      isCompleted: ${todoList[index].isCompleted.toString()}'),
+                      IconButton(
+                        icon: const Icon(Icons.delete),
                         color: Colors.grey,
+                        onPressed: () {
+                          setState(() {
+                            todoList.removeAt(index);
+
+                            ///this logic is for your checkbox
+                            //  todoList[index].isCompleted =
+                            //      !(todoList[index].isCompleted);
+
+                            ///logic for edit title
+                            // showBottomSheet(context: context, builder: builder)
+                            //  todoList[index].title = _textEditingController.text;
+                          });
+                        },
                       )
                     ],
                   ),
@@ -53,8 +86,67 @@ class _TodoAppState extends State<TodoApp> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.add),
+        onPressed: () {
+          _textEditingController.text = '';
+          showModalBottomSheet(
+              isScrollControlled: true,
+              context: context,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                topRight: Radius.circular(12),
+                topLeft: Radius.circular(12),
+              )),
+              builder: (context) {
+                return Padding(
+                  padding: EdgeInsets.only(
+                      top: 36,
+                      right: 20,
+                      left: 20,
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 36),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    TextField(
+                      controller: _textEditingController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter ToDo Title',
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          if (_textEditingController.text.isNotEmpty) {
+                            TodoItemData obj = TodoItemData(
+                                title: _textEditingController.text,
+                                subTitle: '',
+                                isCompleted: false);
+                            todoList.add(obj);
+                          }
+                        });
+
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 18),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.blueAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                            child: Text(
+                          'Add a Todo',
+                          style: TextStyle(fontSize: 16, color: Colors.white),
+                        )),
+                      ),
+                    ),
+                  ]),
+                );
+              });
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
