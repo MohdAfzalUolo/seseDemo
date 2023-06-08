@@ -51,20 +51,96 @@ class _TodoAppState extends State<TodoApp> {
                   width: double.infinity,
                   height: 60,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                          '${todoList[index].title}      isCompleted: ${todoList[index].isCompleted.toString()}'),
+                      Text('${todoList[index].title}'),
+                      /* isCompleted: ${todoList[index].isCompleted.toString()}*/
+                      Spacer(),
+                      IconButton(
+                          onPressed: () {
+                            setState(() {
+                              ///this logic is for your checkbox
+                              todoList[index].isCompleted =
+                                  !(todoList[index].isCompleted);
+                            });
+                          },
+                          icon: Icon(Icons.cached)),
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          _textEditingController.text = todoList[index].title;
+                          showModalBottomSheet(
+                              isScrollControlled: true,
+                              context: context,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(12),
+                                topLeft: Radius.circular(12),
+                              )),
+                              builder: (context) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 36,
+                                      right: 20,
+                                      left: 20,
+                                      bottom: MediaQuery.of(context)
+                                              .viewInsets
+                                              .bottom +
+                                          36),
+                                  child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        TextField(
+                                          controller: _textEditingController,
+                                          decoration: const InputDecoration(
+                                            border: OutlineInputBorder(),
+                                            hintText: 'Enter ToDo Title',
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              todoList[index].title =
+                                                  _textEditingController.text;
+                                            });
+
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 18),
+                                            width: double.infinity,
+                                            decoration: BoxDecoration(
+                                              color: Colors.blueAccent,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: const Center(
+                                                child: Text(
+                                              'Update todo title',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white),
+                                            )),
+                                          ),
+                                        ),
+                                      ]),
+                                );
+                              });
+                        },
+                      ),
                       IconButton(
                         icon: const Icon(Icons.delete),
-                        color: Colors.grey,
+                        color: Colors.black,
                         onPressed: () {
                           setState(() {
                             todoList.removeAt(index);
-
-                            ///this logic is for your checkbox
-                            //  todoList[index].isCompleted =
-                            //      !(todoList[index].isCompleted);
 
                             ///logic for edit title
                             // showBottomSheet(context: context, builder: builder)
