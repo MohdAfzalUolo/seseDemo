@@ -2,7 +2,11 @@ import 'package:dummy/data/todo_data.dart';
 import 'package:flutter/material.dart';
 
 class TodoApp extends StatefulWidget {
-  const TodoApp({Key? key}) : super(key: key);
+  // final List<TodoItemData> todoList;
+  const TodoApp({
+    Key? key,
+    // required this.todoList
+  }) : super(key: key);
 
   @override
   State<TodoApp> createState() => _TodoAppState();
@@ -108,6 +112,7 @@ class _TodoAppState extends State<TodoApp> {
                                             setState(() {
                                               todoList[index].title =
                                                   _textEditingController.text;
+                                              // Map<String,dynamic> row = todoList.toJson();
                                             });
 
                                             Navigator.pop(context);
@@ -198,6 +203,7 @@ class _TodoAppState extends State<TodoApp> {
                                 title: _textEditingController.text,
                                 subTitle: '',
                                 isCompleted: false);
+                            // Map<String,dynamic> row=  obj.toJson();
                             todoList.add(obj);
                           }
                         });
